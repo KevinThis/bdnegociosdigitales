@@ -1,4 +1,3 @@
-```sql
 -- Limpieza (opcional)
 IF OBJECT_ID('dbo.Pagos','U') IS NOT NULL DROP TABLE dbo.Pagos;
 IF OBJECT_ID('dbo.DetalleVenta','U') IS NOT NULL DROP TABLE dbo.DetalleVenta;
@@ -90,4 +89,3 @@ INSERT INTO dbo.Pagos(VentaId,FechaPago,Monto,Metodo) VALUES
 (1,'2026-01-05 10:31',575,'Tarjeta'),
 (2,'2026-01-06 12:40',3100,'Transferencia'),
 (5,'2026-02-01 15:00',1200,'Efectivo');
-```
