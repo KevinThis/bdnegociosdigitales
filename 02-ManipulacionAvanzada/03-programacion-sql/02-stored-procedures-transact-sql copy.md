@@ -451,3 +451,151 @@ SINTAXIS
 | ERROR_PROCEDURE() | Procedimiento |
 | ERROR_SEVERITY() | Nivel de Gravedad |
 | ERROR_STATE() | Estado del Error |
+
+```sql
+/* ====================================== Manejo de Errores con Try ... Catch ============================================== */
+-- Sin TRY - CATCH
+SELECT 10/0;
+
+-- CON TRY .. CATCH
+BEGIN TRY
+    SELECT 10/0;
+END TRY
+BEGIN CATCH
+    PRINT 'Ocurrio un error';
+END CATCH;
+
+-- Ejemplo de uso de funciones para obtener información del error
+BEGIN TRY
+    SELECT 10/0;
+END TRY
+BEGIN CATCH
+    PRINT 'Mensaje: ' + ERROR_MESSAGE();
+    PRINT 'Número de Error: ' + CAST(ERROR_NUMBER() AS VARCHAR);
+    PRINT 'Línea de Error: ' + CAST(ERROR_LINE() AS VARCHAR);
+    PRINT 'Estado del Error: ' + CAST(ERROR_STATE() AS VARCHAR);
+END  CATCH;
+
+CREATE TABLE clientes(
+    id INT PRIMARY KEY,
+    nombre VARCHAR(35)
+);
+GO
+
+INSERT INTO clientes
+VALUES(1, 'PANFILO');
+GO
+
+BEGIN TRY
+
+    INSERT INTO clientes
+    VALUES(1,'EUSTACIO');
+
+END TRY
+BEGIN CATCH
+    PRINT 'Error al insertar: ' + ERROR_MESSAGE();
+    PRINT 'Error en la linea: ' + CAST(ERROR_LINE() AS VARCHAR);
+END CATCH
+GO
+
+BEGIN TRANSACTION;
+
+INSERT INTO clientes
+VALUES(2,'Americo');
+
+SELECT * FROM clientes;
+
+COMMIT;
+ROLLBACK;
+
+-- Ejemplo de uso de transacciones junto con el try catch
+SELECT * FROM clientes;
+GO
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    INSERT INTO clientes
+    Values(3,'VALDERABANO');
+    INSERT INTO clientes
+    VALUES (4,'ROLES ALINA');
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 1
+    BEGIN
+     ROLLBACK;
+    END
+     PRINT 'Se hizo ROLLBACK por error';
+     PRINT 'ERROR: ' + ERROR_MESSAGE();
+END CATCH
+GO
+
+-- Crear un Store Procedure que inserte un cliente, con las validaciones necesarias.
+CREATE OR ALTER PROCEDURE usp_insertar_cliente
+    @id INT,
+    @nombre VARCHAR(35)
+AS
+BEGIN
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        INSERT INTO clientes
+        VALUES (@id, @nombre);
+        COMMIT;
+        PRINT 'Cliente insertado';
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 1
+        BEGIN
+         ROLLBACK;
+        END
+        PRINT 'ERROR: ' + ERROR_MESSAGE();
+    END CATCH
+END;
+GO
+
+SELECT * FROM clientes;
+
+UPDATE clientes
+SET nombre = 'AMERICO AZUL'
+WHERE id = 1;
+
+IF @@ROWCOUNT < 1
+BEGIN
+    PRINT @@ROWCOUNT;
+    PRINT 'No existe el cliente';
+END
+ELSE
+    PRINT 'Cliente actualizado';
+
+CREATE TABLE teams
+(
+    id INT NOT NULL IDENTITY PRIMARY KEY,
+    nombre NVARCHAR(15)
+
+);
+
+INSERT INTO teams (nombre)
+VALUES ('CHAFA AZUL');
+
+-- FORMA DE OBTENER UN IDENTITY INSERTADO FORMA 1
+DECLARE @id_insertado INT
+SET @id_insertado = @@IDENTITY
+PRINT 'ID INSERTADO: ' + CAST(@id_insertado AS VARCHAR);
+SELECT @id_insertado = @@IDENTITY
+PRINT 'ID INSERTADO FORMA 2: ' + CAST(@id_insertado AS VARCHAR);
+
+INSERT INTO teams (nombre)
+VALUES ('ÁGUILAS');
+
+-- FORMA DE OBTENER UN IDENTITY INSERTADO FORMA 2
+DECLARE @id_insertado2 INT
+SET @id_insertado2 = SCOPE_IDENTITY();
+PRINT 'ID INSERTADO: ' + CAST(@id_insertado2 AS VARCHAR);
+SELECT @id_insertado2 = SCOPE_IDENTITY();
+PRINT 'ID INSERTADO FORMA 2: ' + CAST(@id_insertado2 AS VARCHAR);
+
+SELECT * FROM teams;
+```
