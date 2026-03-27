@@ -1,7 +1,7 @@
 # Proceso de la práctica
 
 ## 1. Creación de la base de datos
-Primero se verifica si la base de datos `bdpracticas` ya existe. Si no existe, se crea. Después se selecciona esa base para trabajar en ella.
+Primero se crea la base de datos `bdpracticas` y después se selecciona para trabajar en ella.
 
 ![alt text](/img/imaga.png)
 
@@ -94,9 +94,10 @@ Si todas las validaciones son correctas, entonces se realiza el proceso de venta
 
 1. Se inicia una transacción con `BEGIN TRANSACTION`
 2. Se inserta la venta en `TblVenta`
-3. Se inserta el detalle en `TblDetalleVenta`
-4. Se actualiza la existencia del producto en `CatProducto`
-5. Se guarda todo con `COMMIT`
+3. Se obtiene el id de la venta con `SCOPE_IDENTITY()`
+4. Se inserta el detalle en `TblDetalleVenta`
+5. Se actualiza la existencia del producto en `CatProducto`
+6. Se guarda todo con `COMMIT`
 
 ## 8. Manejo de errores
 El procedimiento usa `TRY...CATCH` para controlar errores.
