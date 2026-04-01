@@ -148,7 +148,7 @@ Para probar el procedimiento se declaró una variable del tipo `dbo.TypeDetalleV
 Después se ejecutó el procedimiento:
 
 ```sql
-EXEC dbo.usp_agregar_venta_n_productos
+EXEC dbo.usp_agregar_venta_productos
     @id_cliente = 'ALFKI',
     @detalle = @productos;
 ```
